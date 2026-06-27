@@ -191,8 +191,8 @@ export default function Home() {
         body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
         /* NAVBAR */
-        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 5vw; height: 68px; display: flex; align-items: center; justify-content: space-between; transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
-        nav.scrolled { background: rgba(10,10,10,0.75); backdrop-filter: blur(20px); border-color: var(--border); }
+        #navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 5vw; height: 68px; display: flex; align-items: center; justify-content: space-between; transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
+        #navbar.scrolled { background: rgba(10,10,10,0.75); backdrop-filter: blur(20px); border-color: var(--border); }
         .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; }
         .nav-links { display: flex; gap: 2.5rem; list-style: none; }
         .nav-links a { font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); text-decoration: none; opacity: 0.75; transition: opacity 0.2s, color 0.2s; }
@@ -570,18 +570,18 @@ export default function Home() {
             <p className="footer-brand-name">DINK</p>
             <p className="footer-brand-desc">Sveriges bästa pickleball-utrustning. För spelare som vill äga köket – varje match, varje dag.</p>
           </div>
-          <nav aria-label="Shopnavigation">
+          <div>
             <p className="footer-col-title">Shop</p>
             <ul className="footer-links">
               {['Paddlar','Bollar','Väskor','Tillbehör','Nya produkter'].map(l => <li key={l}><a href="#">{l}</a></li>)}
             </ul>
-          </nav>
-          <nav aria-label="Infonavigation">
+          </div>
+          <div>
             <p className="footer-col-title">Info</p>
             <ul className="footer-links">
               {['Om DINK','Frakt & Retur','Storleksguide','FAQ','Kontakt'].map(l => <li key={l}><a href="#">{l}</a></li>)}
             </ul>
-          </nav>
+          </div>
           <div>
             <p className="footer-col-title">Kontakt</p>
             <ul className="footer-links">
