@@ -173,6 +173,15 @@ export default function Home() {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         />
+        {/* Critical nav styles in head to prevent flash */}
+        <style>{`
+          .hamburger { display: none !important; }
+          .nav-links { display: flex !important; }
+          @media (max-width: 760px) {
+            .hamburger { display: flex !important; }
+            .nav-links { display: none !important; }
+          }
+        `}</style>
       </Head>
 
       <style>{`
