@@ -1,13 +1,12 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import type { NextRequest, NextFetchEvent } from 'next/server';
 
 const PASSWORD = 'dink2026';
 const COOKIE = 'dink_auth';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest, event: NextFetchEvent) {
   const { pathname } = request.nextUrl;
 
-  // Låt lösenordssidan och API-routen passera fritt
   if (pathname === '/login' || pathname === '/api/login') {
     return NextResponse.next();
   }
@@ -23,6 +22,6 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = {
+export const config: import('next/server').ProxyConfig = {
   matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };
