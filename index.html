@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DINK – Own the Kitchen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0A0A0A;
+      --accent: #C8FF00;
+      --white: #FFFFFF;
+      --card-bg: #1A1A1A;
+      --sub: #555555;
+      --border: #2A2A2A;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 0 5vw;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+      border-bottom: 1px solid transparent;
+    }
+
+    nav.scrolled {
+      background: rgba(10,10,10,0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-color: var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      text-decoration: none;
+      line-height: 1;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      opacity: 0.75;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; color: var(--accent); }
+
+    .nav-right { display: flex; align-items: center; gap: 1.25rem; }
+
+    .cart-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--white);
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+
+    .cart-btn:hover { opacity: 1; color: var(--accent); }
+
+    .cart-count {
+      background: var(--accent);
+      color: #000;
+      font-size: 0.65rem;
+      font-weight: 700;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      height: 100vh;
+      min-height: 600px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 5vw;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #0A0A0A 60%, #141414 100%);
+    }
+
+    .hero-lines {
+      position: absolute;
+      inset: 0;
+      opacity: 0.035;
+      background-image:
+        linear-gradient(rgba(200,255,0,1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,255,0,1) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    .hero-court {
+      position: absolute;
+      right: -4vw;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 52vw;
+      max-width: 780px;
+      aspect-ratio: 1;
+      opacity: 0.045;
+    }
+
+    .hero-court svg { width: 100%; height: 100%; }
+
+    .hero-glow {
+      position: absolute;
+      bottom: -20%;
+      right: 10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(200,255,0,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 820px;
+    }
+
+    .hero-eyebrow {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.1s forwards;
+    }
+
+    .hero-h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      line-height: 0.92;
+      letter-spacing: 0.03em;
+    }
+
+    .hero-h1 .line1 {
+      font-size: clamp(5rem, 12vw, 11rem);
+      color: var(--white);
+      display: block;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.25s forwards;
+    }
+
+    .hero-h1 .line2 {
+      font-size: clamp(5.5rem, 13.5vw, 12.5rem);
+      color: var(--accent);
+      display: block;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.4s forwards;
+    }
+
+    .hero-sub {
+      margin-top: 2rem;
+      font-size: clamp(1rem, 1.5vw, 1.15rem);
+      color: rgba(255,255,255,0.6);
+      font-weight: 400;
+      max-width: 440px;
+      line-height: 1.6;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.55s forwards;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.7s 0.7s forwards;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 1rem 2.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(200,255,0,0.35);
+      background: #d8ff1a;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.4);
+      padding: 1rem 2.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s, transform 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--white);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── TICKER ── */
+    .ticker {
+      background: var(--accent);
+      overflow: hidden;
+      padding: 0.85rem 0;
+      display: flex;
+    }
+
+    .ticker-track {
+      display: flex;
+      gap: 0;
+      animation: ticker 22s linear infinite;
+      white-space: nowrap;
+    }
+
+    .ticker-item {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #000;
+      padding: 0 2rem;
+    }
+
+    .ticker-dot {
+      color: rgba(0,0,0,0.35);
+      padding: 0;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ── SECTION SHARED ── */
+    section { padding: 100px 5vw; }
+
+    .section-eyebrow {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      color: var(--white);
+    }
+
+    /* ── PRODUCT GRID ── */
+    .products-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .view-all {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid var(--accent);
+      padding-bottom: 2px;
+      transition: opacity 0.2s;
+    }
+
+    .view-all:hover { opacity: 0.7; }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px)  { .product-grid { grid-template-columns: 1fr; } }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      border-color: rgba(200,255,0,0.25);
+    }
+
+    .product-img {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-img-bg {
+      position: absolute;
+      inset: 0;
+    }
+
+    .product-img svg {
+      width: 52%;
+      height: 52%;
+      position: relative;
+      z-index: 1;
+      opacity: 0.9;
+    }
+
+    .product-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.6rem;
+      z-index: 2;
+    }
+
+    .product-info {
+      padding: 1.25rem;
+    }
+
+    .product-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 0.35rem;
+    }
+
+    .product-desc {
+      font-size: 0.78rem;
+      color: var(--sub);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
+    .product-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .product-price {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .add-btn {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.2);
+      color: var(--white);
+      padding: 0.5rem 0.9rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
+    }
+
+    .add-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #000;
+    }
+
+    /* ── FEATURED PRODUCT ── */
+    .featured {
+      background: var(--card-bg);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .featured-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5vw;
+      align-items: center;
+    }
+
+    @media (max-width: 820px) {
+      .featured-inner { grid-template-columns: 1fr; }
+    }
+
+    .featured-img {
+      aspect-ratio: 1 / 1;
+      background: linear-gradient(135deg, #0f0f0f 0%, #1e1e1e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .featured-img-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(200,255,0,0.08) 0%, transparent 65%);
+    }
+
+    .featured-img svg {
+      width: 55%;
+      height: 55%;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 0 40px rgba(200,255,0,0.2));
+    }
+
+    .featured-badge {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.8rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .featured-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 1rem;
+    }
+
+    .featured-desc {
+      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.7;
+      margin-bottom: 2rem;
+      max-width: 400px;
+    }
+
+    .specs {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+    }
+
+    .spec-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .spec-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(200,255,0,0.08);
+      border: 1px solid rgba(200,255,0,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .spec-label {
+      color: var(--sub);
+      min-width: 80px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+
+    .spec-val {
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .featured-price {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── USP ── */
+    .usp-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      margin-top: 4rem;
+      border: 1px solid var(--border);
+    }
+
+    @media (max-width: 900px)  { .usp-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px)  { .usp-grid { grid-template-columns: 1fr; } }
+
+    .usp-card {
+      background: var(--card-bg);
+      padding: 2.5rem 2rem;
+      border-right: 1px solid var(--border);
+      transition: background 0.25s;
+    }
+
+    .usp-card:last-child { border-right: none; }
+    .usp-card:hover { background: #202020; }
+
+    .usp-icon {
+      font-size: 1.75rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .usp-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    .usp-text {
+      font-size: 0.875rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.65;
+    }
+
+    /* ── COMMUNITY ── */
+    .community {
+      background: linear-gradient(135deg, #0d0d0d 0%, #111111 100%);
+      text-align: center;
+      padding: 120px 5vw;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .community-glow {
+      position: absolute;
+      top: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80vw;
+      height: 80vw;
+      background: radial-gradient(circle, rgba(200,255,0,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .community-content { position: relative; z-index: 1; }
+
+    .community-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 8vw, 8rem);
+      letter-spacing: 0.04em;
+      line-height: 0.95;
+      margin-bottom: 1.5rem;
+    }
+
+    .community-title span { color: var(--accent); }
+
+    .community-sub {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.5);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .community-stats {
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      margin-top: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--sub);
+      margin-top: 0.35rem;
+    }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      border-top: 1px solid var(--border);
+      padding: 100px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .newsletter-left { max-width: 500px; }
+
+    .newsletter-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+    }
+
+    .newsletter-title span { color: var(--accent); }
+
+    .newsletter-sub {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.6;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 0;
+      max-width: 440px;
+      width: 100%;
+    }
+
+    .newsletter-form input {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-right: none;
+      color: var(--white);
+      padding: 1rem 1.25rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .newsletter-form input::placeholder { color: var(--sub); }
+    .newsletter-form input:focus { border-color: var(--accent); }
+
+    .newsletter-form button {
+      background: var(--accent);
+      color: #000;
+      border: none;
+      padding: 1rem 1.5rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .newsletter-form button:hover { background: #d8ff1a; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 4rem 5vw 2.5rem;
+    }
+
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 3rem;
+      margin-bottom: 3.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .footer-top { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 500px) {
+      .footer-top { grid-template-columns: 1fr; }
+    }
+
+    .footer-brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-brand-desc {
+      font-size: 0.875rem;
+      color: var(--sub);
+      line-height: 1.7;
+      max-width: 260px;
+    }
+
+    .footer-col-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.65rem; }
+
+    .footer-links a {
+      font-size: 0.875rem;
+      color: var(--sub);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--white); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border);
+      padding-top: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: var(--sub);
+    }
+
+    .footer-copy span { color: var(--accent); }
+
+    .social-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .social-link {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--sub);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .social-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ── CART DRAWER ── */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(420px, 100vw);
+      background: #111;
+      border-left: 1px solid var(--border);
+      z-index: 201;
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-drawer.open { transform: translateX(0); }
+
+    .cart-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cart-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .cart-close {
+      background: none;
+      border: none;
+      color: var(--white);
+      cursor: pointer;
+      font-size: 1.5rem;
+      line-height: 1;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .cart-close:hover { opacity: 1; }
+
+    .cart-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+    }
+
+    .cart-empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--sub);
+    }
+
+    .cart-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+    .cart-empty-text {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .cart-items { display: flex; flex-direction: column; gap: 1rem; }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 60px 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .cart-item-img {
+      width: 60px;
+      height: 60px;
+      background: var(--card-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .cart-item-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.25rem;
+    }
+
+    .cart-item-price { font-size: 0.85rem; color: var(--accent); font-weight: 600; }
+
+    .remove-item {
+      background: none;
+      border: none;
+      color: var(--sub);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: color 0.2s;
+    }
+
+    .remove-item:hover { color: #ff4444; }
+
+    .cart-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .cart-total {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .cart-total-price { color: var(--accent); font-size: 1.1rem; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--accent);
+      color: #000;
+      padding: 0.85rem 1.75rem;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      z-index: 300;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── MOBILE NAV ── */
+    .hamburger {
+      display: none;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex-direction: column;
+      gap: 5px;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--white);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    @media (max-width: 760px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+    }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s, transform 0.7s;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* product image gradients */
+    .grad-1 { background: linear-gradient(135deg, #1a1f0a 0%, #2d3d00 100%); }
+    .grad-2 { background: linear-gradient(135deg, #0a1a1f 0%, #00283d 100%); }
+    .grad-3 { background: linear-gradient(135deg, #1a0a0f 0%, #3d0010 100%); }
+    .grad-4 { background: linear-gradient(135deg, #1a1a0a 0%, #3d3d00 100%); }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">DINK</a>
+  <ul class="nav-links">
+    <li><a href="#produkter">Shop</a></li>
+    <li><a href="#om-oss">Om oss</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="hamburger" aria-label="Meny">
+      <span></span><span></span><span></span>
+    </button>
+    <button class="cart-btn" id="cartBtn" aria-label="Kundvagn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+      KORG
+      <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-lines"></div>
+  <div class="hero-court">
+    <svg viewBox="0 0 600 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="60" width="480" height="480" stroke="#C8FF00" stroke-width="3"/>
+      <line x1="300" y1="60" x2="300" y2="540" stroke="#C8FF00" stroke-width="2"/>
+      <line x1="60" y1="300" x2="540" y2="300" stroke="#C8FF00" stroke-width="3"/>
+      <line x1="60" y1="168" x2="540" y2="168" stroke="#C8FF00" stroke-width="1.5"/>
+      <line x1="60" y1="432" x2="540" y2="432" stroke="#C8FF00" stroke-width="1.5"/>
+      <rect x="160" y="168" width="280" height="132" stroke="#C8FF00" stroke-width="1.5"/>
+      <rect x="160" y="300" width="280" height="132" stroke="#C8FF00" stroke-width="1.5"/>
+    </svg>
+  </div>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Sveriges #1 Pickleball Store</p>
+    <h1 class="hero-h1">
+      <span class="line1">OWN THE</span>
+      <span class="line2">KITCHEN.</span>
+    </h1>
+    <p class="hero-sub">Sveriges bästa pickleball-utrustning. Levererad till din dörr.</p>
+    <div class="hero-ctas">
+      <a href="#produkter" class="btn-primary">SHOPPA NU</a>
+      <a href="#featured" class="btn-outline">LÄR DIG MER</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── TICKER ── -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ── PRODUCT GRID ── -->
+<section id="produkter">
+  <div class="products-header reveal">
+    <div>
+      <p class="section-eyebrow">Utvalda produkter</p>
+      <h2 class="section-title">THE ARSENAL</h2>
+    </div>
+    <a href="#" class="view-all">Visa alla →</a>
+  </div>
+  <div class="product-grid">
+
+    <div class="product-card reveal" data-name="PRO CARBON PADDLE" data-price="1299" data-emoji="🏓">
+      <div class="product-img grad-1">
+        <div class="product-img-bg"></div>
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="42" rx="28" ry="32" fill="#C8FF00" opacity="0.9"/>
+          <rect x="44" y="72" width="12" height="22" rx="6" fill="#888"/>
+          <ellipse cx="50" cy="42" rx="22" ry="26" fill="none" stroke="#000" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="50" y="46" text-anchor="middle" font-size="10" font-weight="bold" fill="#000" font-family="sans-serif">DINK</text>
+        </svg>
+        <span class="product-badge">Bestseller</span>
+      </div>
+      <div class="product-info">
+        <p class="product-name">PRO CARBON PADDLE</p>
+        <p class="product-desc">Kolfiberpaddle för den som vill dominera köket</p>
+        <div class="product-footer">
+          <span class="product-price">1 299 kr</span>
+          <button class="add-btn" onclick="addToCart(this)">LÄGG I VARUKORG</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-name="OUTDOOR BALLS 3-PACK" data-price="249" data-emoji="🟡">
+      <div class="product-img grad-2">
+        <div class="product-img-bg"></div>
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="36" cy="55" r="18" fill="#C8FF00" opacity="0.7"/>
+          <circle cx="64" cy="55" r="18" fill="#C8FF00" opacity="0.85"/>
+          <circle cx="50" cy="36" r="18" fill="#C8FF00"/>
+          <circle cx="36" cy="55" r="18" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 2"/>
+          <circle cx="64" cy="55" r="18" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 2"/>
+          <circle cx="50" cy="36" r="18" fill="none" stroke="#000" stroke-width="1" stroke-dasharray="3 2"/>
+        </svg>
+      </div>
+      <div class="product-info">
+        <p class="product-name">OUTDOOR BALLS 3-PACK</p>
+        <p class="product-desc">Optimerad för utomhusspel i alla väderförhållanden</p>
+        <div class="product-footer">
+          <span class="product-price">249 kr</span>
+          <button class="add-btn" onclick="addToCart(this)">LÄGG I VARUKORG</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-name="DINK BACKPACK" data-price="899" data-emoji="🎒">
+      <div class="product-img grad-3">
+        <div class="product-img-bg"></div>
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M30 40 Q30 25 50 22 Q70 25 70 40 L72 78 Q72 82 68 82 L32 82 Q28 82 28 78 Z" fill="#C8FF00" opacity="0.9"/>
+          <path d="M40 22 Q40 14 50 14 Q60 14 60 22" stroke="#888" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <rect x="38" y="42" width="24" height="16" rx="3" fill="rgba(0,0,0,0.25)"/>
+          <line x1="50" y1="42" x2="50" y2="58" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+          <text x="50" y="70" text-anchor="middle" font-size="8" font-weight="bold" fill="#000" font-family="sans-serif">DINK</text>
+        </svg>
+      </div>
+      <div class="product-info">
+        <p class="product-name">DINK BACKPACK</p>
+        <p class="product-desc">Rymlig väska med paddelfack och ventilerat rygg</p>
+        <div class="product-footer">
+          <span class="product-price">899 kr</span>
+          <button class="add-btn" onclick="addToCart(this)">LÄGG I VARUKORG</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-card reveal" data-name="GRIP TAPE 3-PACK" data-price="149" data-emoji="🔧">
+      <div class="product-img grad-4">
+        <div class="product-img-bg"></div>
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="32" width="60" height="12" rx="4" fill="#C8FF00" transform="rotate(-15 50 38)"/>
+          <rect x="20" y="48" width="60" height="12" rx="4" fill="#C8FF00" opacity="0.75" transform="rotate(-15 50 54)"/>
+          <rect x="20" y="64" width="60" height="12" rx="4" fill="#C8FF00" opacity="0.5" transform="rotate(-15 50 70)"/>
+        </svg>
+      </div>
+      <div class="product-info">
+        <p class="product-name">GRIP TAPE 3-PACK</p>
+        <p class="product-desc">Absorberande grip för maximal kontroll vid varje slag</p>
+        <div class="product-footer">
+          <span class="product-price">149 kr</span>
+          <button class="add-btn" onclick="addToCart(this)">LÄGG I VARUKORG</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── FEATURED PRODUCT ── -->
+<section class="featured" id="featured">
+  <div class="featured-inner">
+    <div class="featured-img reveal">
+      <div class="featured-img-glow"></div>
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="86" rx="56" ry="64" fill="#C8FF00" opacity="0.95"/>
+        <rect x="88" y="148" width="24" height="42" rx="12" fill="#666"/>
+        <ellipse cx="100" cy="86" rx="44" ry="52" fill="none" stroke="#000" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <ellipse cx="100" cy="86" rx="30" ry="36" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1.5"/>
+        <text x="100" y="88" text-anchor="middle" font-size="16" font-weight="bold" fill="#000" font-family="sans-serif" letter-spacing="2">DINK</text>
+        <text x="100" y="105" text-anchor="middle" font-size="8" fill="rgba(0,0,0,0.5)" font-family="sans-serif" letter-spacing="3">PRO</text>
+      </svg>
+    </div>
+    <div class="reveal">
+      <span class="featured-badge">BÄSTSÄLJARE</span>
+      <h2 class="featured-title">PRO CARBON<br>PADDLE</h2>
+      <p class="featured-desc">Kolfiberpaddle för den som vill dominera köket. Lätt, snabb och precis. Designad för spelare som inte kompromissar.</p>
+      <ul class="specs">
+        <li class="spec-item">
+          <span class="spec-icon">⚖️</span>
+          <span class="spec-label">Vikt</span>
+          <span class="spec-val">220g</span>
+        </li>
+        <li class="spec-item">
+          <span class="spec-icon">🧱</span>
+          <span class="spec-label">Material</span>
+          <span class="spec-val">3K Kolfiber</span>
+        </li>
+        <li class="spec-item">
+          <span class="spec-icon">✋</span>
+          <span class="spec-label">Grip</span>
+          <span class="spec-val">4.25"</span>
+        </li>
+        <li class="spec-item">
+          <span class="spec-icon">🎯</span>
+          <span class="spec-label">Nivå</span>
+          <span class="spec-val">Avancerad</span>
+        </li>
+      </ul>
+      <p class="featured-price">1 299 kr</p>
+      <button class="btn-primary" onclick="addToCartDirect('PRO CARBON PADDLE', 1299, '🏓')">KÖPA NU</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── USP ── -->
+<section id="om-oss">
+  <div class="reveal" style="margin-bottom:0">
+    <p class="section-eyebrow">Varför välja oss</p>
+    <h2 class="section-title">VARFÖR DINK?</h2>
+  </div>
+  <div class="usp-grid">
+    <div class="usp-card reveal">
+      <span class="usp-icon">⚡</span>
+      <p class="usp-title">SNABB LEVERANS</p>
+      <p class="usp-text">1–3 arbetsdagar till hela Sverige. Gratis frakt på alla ordrar över 500 kr.</p>
+    </div>
+    <div class="usp-card reveal">
+      <span class="usp-icon">🏆</span>
+      <p class="usp-title">PREMIUM KVALITET</p>
+      <p class="usp-text">Vi väljer bara ut utrustning som klarar de tuffaste matcherna. Testat av proffs.</p>
+    </div>
+    <div class="usp-card reveal">
+      <span class="usp-icon">🔄</span>
+      <p class="usp-title">30 DAGARS RETUR</p>
+      <p class="usp-text">Inte nöjd? Skicka tillbaka utan krångel. Full återbetalning, inga frågor.</p>
+    </div>
+    <div class="usp-card reveal">
+      <span class="usp-icon">🎾</span>
+      <p class="usp-title">EXPERT SUPPORT</p>
+      <p class="usp-text">Vårt team är pickleballspelare. Vi hjälper dig hitta rätt utrustning för din nivå.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMMUNITY ── -->
+<section class="community" id="community" style="padding:120px 5vw">
+  <div class="community-glow"></div>
+  <div class="community-content reveal">
+    <p class="section-eyebrow">Gå med oss</p>
+    <h2 class="community-title">JOIN THE<br><span>DINK NATION</span></h2>
+    <p class="community-sub">Bli en del av Sveriges snabbast växande pickleball-community. Tävlingar, tips och exklusiva erbjudanden.</p>
+    <a href="#newsletter" class="btn-primary">GÅ MED NU</a>
+    <div class="community-stats">
+      <div class="stat">
+        <p class="stat-num">12K+</p>
+        <p class="stat-label">Aktiva spelare</p>
+      </div>
+      <div class="stat">
+        <p class="stat-num">340+</p>
+        <p class="stat-label">Turneringar 2025</p>
+      </div>
+      <div class="stat">
+        <p class="stat-num">4.9★</p>
+        <p class="stat-label">Snittbetyg</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── NEWSLETTER ── -->
+<section class="newsletter" id="newsletter" style="padding:100px 5vw">
+  <div class="newsletter-left reveal">
+    <p class="section-eyebrow">Håll dig uppdaterad</p>
+    <h2 class="newsletter-title">GET IN<br><span>THE LOOP.</span></h2>
+    <p class="newsletter-sub">Exklusiva erbjudanden, nya produkter och pickleballtips – direkt i din inkorg.</p>
+  </div>
+  <form class="newsletter-form reveal" onsubmit="handleNewsletter(event)">
+    <input type="email" placeholder="Din e-postadress" required />
+    <button type="submit">PRENUMERERA</button>
+  </form>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer id="kontakt">
+  <div class="footer-top">
+    <div>
+      <p class="footer-brand-name">DINK</p>
+      <p class="footer-brand-desc">Sveriges bästa pickleball-utrustning. För spelare som vill äga köket – varje match, varje dag.</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Shop</p>
+      <ul class="footer-links">
+        <li><a href="#">Paddlar</a></li>
+        <li><a href="#">Bollar</a></li>
+        <li><a href="#">Väskor</a></li>
+        <li><a href="#">Tillbehör</a></li>
+        <li><a href="#">Nya produkter</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Info</p>
+      <ul class="footer-links">
+        <li><a href="#">Om DINK</a></li>
+        <li><a href="#">Frakt & Retur</a></li>
+        <li><a href="#">Storleksguide</a></li>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Kontakt</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Kontakt</p>
+      <ul class="footer-links">
+        <li><a href="mailto:hej@dink.se">hej@dink.se</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">YouTube</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© 2025 <span>DINK</span> — Own the Kitchen. Alla rättigheter förbehållna.</p>
+    <div class="social-links">
+      <a href="#" class="social-link" aria-label="Instagram">IG</a>
+      <a href="#" class="social-link" aria-label="TikTok">TK</a>
+      <a href="#" class="social-link" aria-label="YouTube">YT</a>
+    </div>
+  </div>
+</footer>
+
+<!-- ── CART DRAWER ── -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <p class="cart-title">Din korg (<span id="cartItemCount">0</span>)</p>
+    <button class="cart-close" onclick="closeCart()">×</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">
+      <p class="cart-empty-icon">🏓</p>
+      <p class="cart-empty-text">Din korg är tom.<br>Börja shoppa för att lägga till produkter.</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total">
+      <span>Totalt</span>
+      <span class="cart-total-price" id="cartTotal">0 kr</span>
+    </div>
+    <button class="btn-primary" style="width:100%;text-align:center" onclick="showToast('Kassa kommer snart! 🚀')">TILL KASSAN</button>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // Navbar scroll
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Ticker
+  const items = [
+    'FREE FRAKT ÖVER 500KR', 'OWN THE KITCHEN', 'SNABB LEVERANS',
+    'DINK', 'FREE FRAKT ÖVER 500KR', 'OWN THE KITCHEN', 'SNABB LEVERANS', 'DINK',
+    'FREE FRAKT ÖVER 500KR', 'OWN THE KITCHEN', 'SNABB LEVERANS',
+    'DINK', 'FREE FRAKT ÖVER 500KR', 'OWN THE KITCHEN', 'SNABB LEVERANS', 'DINK',
+  ];
+  const track = document.getElementById('tickerTrack');
+  const doubled = [...items, ...items];
+  doubled.forEach((t, i) => {
+    const el = document.createElement('span');
+    el.className = 'ticker-item';
+    el.textContent = t;
+    track.appendChild(el);
+    if (i < doubled.length - 1) {
+      const dot = document.createElement('span');
+      dot.className = 'ticker-item ticker-dot';
+      dot.textContent = '·';
+      track.appendChild(dot);
+    }
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => io.observe(el));
+
+  // Cart state
+  let cart = [];
+
+  function addToCart(btn) {
+    const card = btn.closest('.product-card');
+    const name = card.dataset.name;
+    const price = parseInt(card.dataset.price);
+    const emoji = card.dataset.emoji;
+    addToCartDirect(name, price, emoji);
+  }
+
+  function addToCartDirect(name, price, emoji) {
+    const existing = cart.find(i => i.name === name);
+    if (existing) { existing.qty++; }
+    else { cart.push({ name, price, emoji, qty: 1 }); }
+    updateCartUI();
+    showToast(`${name} lagd i korgen!`);
+  }
+
+  function removeItem(idx) {
+    cart.splice(idx, 1);
+    updateCartUI();
+  }
+
+  function updateCartUI() {
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    document.getElementById('cartCount').textContent = count;
+    document.getElementById('cartItemCount').textContent = count;
+    document.getElementById('cartTotal').textContent = total.toLocaleString('sv-SE') + ' kr';
+
+    const body = document.getElementById('cartBody');
+    const footer = document.getElementById('cartFooter');
+
+    if (cart.length === 0) {
+      body.innerHTML = `<div class="cart-empty"><p class="cart-empty-icon">🏓</p><p class="cart-empty-text">Din korg är tom.<br>Börja shoppa för att lägga till produkter.</p></div>`;
+      footer.style.display = 'none';
+    } else {
+      footer.style.display = 'block';
+      body.innerHTML = `<div class="cart-items">${cart.map((item, i) => `
+        <div class="cart-item">
+          <div class="cart-item-img">${item.emoji}</div>
+          <div>
+            <p class="cart-item-name">${item.name}</p>
+            <p class="cart-item-price">${(item.price * item.qty).toLocaleString('sv-SE')} kr${item.qty > 1 ? ` (${item.qty}×)` : ''}</p>
+          </div>
+          <button class="remove-item" onclick="removeItem(${i})">✕</button>
+        </div>
+      `).join('')}</div>`;
+    }
+  }
+
+  function openCart() {
+    document.getElementById('cartDrawer').classList.add('open');
+    document.getElementById('cartOverlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCart() {
+    document.getElementById('cartDrawer').classList.remove('open');
+    document.getElementById('cartOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('cartBtn').addEventListener('click', openCart);
+
+  // Toast
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Newsletter
+  function handleNewsletter(e) {
+    e.preventDefault();
+    showToast('Tack! Du är nu med i DINK Nation. 🎉');
+    e.target.reset();
+  }
+</script>
+</body>
+</html>
