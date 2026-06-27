@@ -1,6 +1,8 @@
 import Head from 'next/head';
 import { useEffect, useState, useRef } from 'react';
 
+const SITE_URL = 'https://dink-taupe.vercel.app';
+
 const PRODUCTS = [
   { id: 1, name: 'PRO CARBON PADDLE', desc: 'Kolfiberpaddle för den som vill dominera köket', price: 1299, emoji: '🏓', badge: 'Bestseller', grad: 'grad-1' },
   { id: 2, name: 'OUTDOOR BALLS 3-PACK', desc: 'Optimerad för utomhusspel i alla väderförhållanden', price: 249, emoji: '🟡', grad: 'grad-2' },
@@ -8,24 +10,62 @@ const PRODUCTS = [
   { id: 4, name: 'GRIP TAPE 3-PACK', desc: 'Absorberande grip för maximal kontroll vid varje slag', price: 149, emoji: '🔧', grad: 'grad-4' },
 ];
 
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#organization`,
+      name: 'DINK',
+      url: SITE_URL,
+      description: 'Sveriges bästa pickleball-utrustning',
+      contactPoint: { '@type': 'ContactPoint', email: 'hej@dink.se', contactType: 'customer service', availableLanguage: 'Swedish' },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: 'DINK',
+      publisher: { '@id': `${SITE_URL}/#organization` },
+      inLanguage: 'sv-SE',
+    },
+    ...PRODUCTS.map(p => ({
+      '@type': 'Product',
+      name: p.name,
+      description: p.desc,
+      brand: { '@type': 'Brand', name: 'DINK' },
+      offers: {
+        '@type': 'Offer',
+        price: p.price,
+        priceCurrency: 'SEK',
+        availability: 'https://schema.org/InStock',
+        seller: { '@id': `${SITE_URL}/#organization` },
+      },
+    })),
+  ],
+};
+
 export default function Home() {
   const [cart, setCart] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [toast, setToast] = useState({ show: false, msg: '' });
   const [loading, setLoading] = useState(false);
+  const [cookieAccepted, setCookieAccepted] = useState(true);
   const toastTimer = useRef(null);
 
   useEffect(() => {
+    setCookieAccepted(!!localStorage.getItem('dink_cookie'));
+
     const onScroll = () => {
       document.getElementById('navbar')?.classList.toggle('scrolled', window.scrollY > 40);
     };
     window.addEventListener('scroll', onScroll);
 
-    // Ticker
     const items = ['FREE FRAKT ÖVER 500KR', 'OWN THE KITCHEN', 'SNABB LEVERANS', 'DINK'];
     const doubled = [...items, ...items, ...items, ...items];
     const track = document.getElementById('tickerTrack');
-    if (track) {
+    if (track && track.childNodes.length === 0) {
       doubled.forEach((t, i) => {
         const el = document.createElement('span');
         el.className = 'ticker-item';
@@ -40,7 +80,6 @@ export default function Home() {
       });
     }
 
-    // Scroll reveal
     const reveals = document.querySelectorAll('.reveal');
     const io = new IntersectionObserver((entries) => {
       entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); } });
@@ -51,8 +90,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = cartOpen ? 'hidden' : '';
-  }, [cartOpen]);
+    document.body.style.overflow = (cartOpen || menuOpen) ? 'hidden' : '';
+  }, [cartOpen, menuOpen]);
+
+  function acceptCookies() {
+    localStorage.setItem('dink_cookie', '1');
+    setCookieAccepted(true);
+  }
 
   function showToast(msg) {
     setToast({ show: true, msg });
@@ -97,12 +141,38 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>DINK – Own the Kitchen</title>
-        <meta name="description" content="Sveriges bästa pickleball-utrustning. Levererad till din dörr." />
+        <title>DINK – Own the Kitchen | Sveriges bästa pickleball-utrustning</title>
+        <meta name="description" content="Köp premium pickleball-utrustning online. Paddlar, bollar, väskor och tillbehör. Gratis frakt över 500 kr. Snabb leverans 1–3 dagar." />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href={SITE_URL} />
+
+        {/* OpenGraph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={SITE_URL} />
+        <meta property="og:title" content="DINK – Own the Kitchen" />
+        <meta property="og:description" content="Sveriges bästa pickleball-utrustning. Paddlar, bollar, väskor och tillbehör. Gratis frakt över 500 kr." />
+        <meta property="og:image" content={`${SITE_URL}/og-image.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="sv_SE" />
+        <meta property="og:site_name" content="DINK" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="DINK – Own the Kitchen" />
+        <meta name="twitter:description" content="Sveriges bästa pickleball-utrustning. Gratis frakt över 500 kr." />
+        <meta name="twitter:image" content={`${SITE_URL}/og-image.png`} />
+
+        {/* Fonts – display=swap förhindrar FOIT och blockerar inte rendering */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+        {/* Structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </Head>
 
       <style>{`
@@ -111,6 +181,7 @@ export default function Home() {
         html { scroll-behavior: smooth; }
         body { background: var(--bg); color: var(--white); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
+        /* NAVBAR */
         nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0 5vw; height: 68px; display: flex; align-items: center; justify-content: space-between; transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s; border-bottom: 1px solid transparent; }
         nav.scrolled { background: rgba(10,10,10,0.75); backdrop-filter: blur(20px); border-color: var(--border); }
         .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: 0.12em; color: var(--accent); text-decoration: none; }
@@ -122,6 +193,22 @@ export default function Home() {
         .cart-btn:hover { opacity: 1; color: var(--accent); }
         .cart-count { background: var(--accent); color: #000; font-size: 0.65rem; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
+        /* HAMBURGER */
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; flex-direction: column; gap: 5px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
+        .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .hamburger.open span:nth-child(2) { opacity: 0; }
+        .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* MOBILE MENU */
+        .mobile-menu { position: fixed; inset: 0; background: #0a0a0a; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+        .mobile-menu.open { transform: translateX(0); }
+        .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.08em; color: var(--white); text-decoration: none; transition: color 0.2s; }
+        .mobile-menu a:hover { color: var(--accent); }
+
+        @media (max-width: 760px) { .nav-links { display: none; } .hamburger { display: flex; } }
+
+        /* HERO */
         .hero { height: 100vh; min-height: 600px; display: flex; align-items: center; padding: 0 5vw; position: relative; overflow: hidden; }
         .hero-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #0A0A0A 60%, #141414 100%); }
         .hero-lines { position: absolute; inset: 0; opacity: 0.035; background-image: linear-gradient(rgba(200,255,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(200,255,0,1) 1px, transparent 1px); background-size: 80px 80px; }
@@ -143,21 +230,23 @@ export default function Home() {
         .btn-outline { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,0.4); padding: 1rem 2.25rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s, transform 0.2s; text-decoration: none; display: inline-block; }
         .btn-outline:hover { border-color: var(--white); transform: translateY(-2px); }
 
+        /* TICKER */
         .ticker { background: var(--accent); overflow: hidden; padding: 0.85rem 0; display: flex; }
         .ticker-track { display: flex; animation: ticker 22s linear infinite; white-space: nowrap; }
         .ticker-item { font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #000; padding: 0 2rem; }
         .ticker-dot { color: rgba(0,0,0,0.35); padding: 0; }
         @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
+        /* SECTIONS */
         section { padding: 100px 5vw; }
         .section-eyebrow { font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.28em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
         .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 6vw, 5.5rem); letter-spacing: 0.04em; line-height: 1; }
 
+        /* PRODUCTS */
         .products-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
         .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
         @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 560px) { .product-grid { grid-template-columns: 1fr; } }
-
         .product-card { background: var(--card-bg); border: 1px solid var(--border); transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; cursor: pointer; position: relative; overflow: hidden; }
         .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-color: rgba(200,255,0,0.25); }
         .product-img { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative; font-size: 4rem; }
@@ -174,6 +263,7 @@ export default function Home() {
         .add-btn { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: var(--white); padding: 0.5rem 0.9rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s; }
         .add-btn:hover { background: var(--accent); border-color: var(--accent); color: #000; }
 
+        /* FEATURED */
         .featured { background: var(--card-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
         .featured-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; align-items: center; }
         @media (max-width: 820px) { .featured-inner { grid-template-columns: 1fr; } }
@@ -189,6 +279,7 @@ export default function Home() {
         .spec-val { color: var(--white); font-weight: 500; }
         .featured-price { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 1.25rem; }
 
+        /* USP */
         .usp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 4rem; border: 1px solid var(--border); }
         @media (max-width: 900px) { .usp-grid { grid-template-columns: repeat(2, 1fr); } }
         .usp-card { background: var(--card-bg); padding: 2.5rem 2rem; border-right: 1px solid var(--border); transition: background 0.25s; }
@@ -198,6 +289,7 @@ export default function Home() {
         .usp-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem; }
         .usp-text { font-size: 0.875rem; color: rgba(255,255,255,0.5); line-height: 1.65; }
 
+        /* COMMUNITY */
         .community { background: linear-gradient(135deg, #0d0d0d, #111); text-align: center; position: relative; overflow: hidden; }
         .community-glow { position: absolute; top: -30%; left: 50%; transform: translateX(-50%); width: 80vw; height: 80vw; background: radial-gradient(circle, rgba(200,255,0,0.06) 0%, transparent 60%); pointer-events: none; }
         .community-content { position: relative; z-index: 1; }
@@ -208,6 +300,7 @@ export default function Home() {
         .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); color: var(--accent); letter-spacing: 0.04em; line-height: 1; }
         .stat-label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sub); margin-top: 0.35rem; }
 
+        /* NEWSLETTER */
         .newsletter { border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 3rem; flex-wrap: wrap; }
         .newsletter-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4.5rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 0.75rem; }
         .newsletter-title span { color: var(--accent); }
@@ -219,9 +312,11 @@ export default function Home() {
         .newsletter-form button { background: var(--accent); color: #000; border: none; padding: 1rem 1.5rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
         .newsletter-form button:hover { background: #d8ff1a; }
 
+        /* FOOTER */
         footer { border-top: 1px solid var(--border); padding: 4rem 5vw 2.5rem; }
         .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 3.5rem; }
         @media (max-width: 900px) { .footer-top { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 500px) { .footer-top { grid-template-columns: 1fr; } }
         .footer-brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.75rem; }
         .footer-brand-desc { font-size: 0.875rem; color: var(--sub); line-height: 1.7; max-width: 260px; }
         .footer-col-title { font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 1.25rem; }
@@ -235,6 +330,7 @@ export default function Home() {
         .social-link { width: 36px; height: 36px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--sub); text-decoration: none; font-size: 0.75rem; font-weight: 700; transition: border-color 0.2s, color 0.2s; }
         .social-link:hover { border-color: var(--accent); color: var(--accent); }
 
+        /* CART */
         .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
         .cart-overlay.open { opacity: 1; pointer-events: all; }
         .cart-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); background: #111; border-left: 1px solid var(--border); z-index: 201; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; }
@@ -259,18 +355,29 @@ export default function Home() {
         .cart-total-price { color: var(--accent); font-size: 1.1rem; }
         .stripe-note { font-size: 0.72rem; color: var(--sub); text-align: center; margin-top: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
 
-        .toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--accent); color: #000; padding: 0.85rem 1.75rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; z-index: 300; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
+        /* TOAST */
+        .toast { position: fixed; bottom: 5rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--accent); color: #000; padding: 0.85rem 1.75rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; z-index: 300; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
         .toast.show { transform: translateX(-50%) translateY(0); }
 
+        /* COOKIE BANNER */
+        .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; z-index: 250; background: #111; border-top: 1px solid var(--border); padding: 1.25rem 5vw; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; flex-wrap: wrap; }
+        .cookie-text { font-size: 0.82rem; color: rgba(255,255,255,0.6); line-height: 1.5; max-width: 640px; }
+        .cookie-text a { color: var(--accent); text-decoration: none; }
+        .cookie-text a:hover { text-decoration: underline; }
+        .cookie-btns { display: flex; gap: 0.75rem; flex-shrink: 0; }
+        .cookie-accept { background: var(--accent); color: #000; border: none; padding: 0.65rem 1.5rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+        .cookie-accept:hover { background: #d8ff1a; }
+        .cookie-decline { background: transparent; color: var(--sub); border: 1px solid var(--border); padding: 0.65rem 1.5rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+        .cookie-decline:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+        /* REVEAL */
         .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s, transform 0.7s; }
         .reveal.visible { opacity: 1; transform: translateY(0); }
-
-        @media (max-width: 760px) { .nav-links { display: none; } }
       `}</style>
 
       {/* NAVBAR */}
-      <nav id="navbar">
-        <a href="#" className="nav-logo">DINK</a>
+      <nav id="navbar" role="navigation" aria-label="Huvudnavigation">
+        <a href="/" className="nav-logo" aria-label="DINK – Startsida">DINK</a>
         <ul className="nav-links">
           <li><a href="#produkter">Shop</a></li>
           <li><a href="#om-oss">Om oss</a></li>
@@ -278,22 +385,37 @@ export default function Home() {
           <li><a href="#kontakt">Kontakt</a></li>
         </ul>
         <div className="nav-right">
-          <button className="cart-btn" onClick={() => setCartOpen(true)}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <button
+            className={`hamburger ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label={menuOpen ? 'Stäng meny' : 'Öppna meny'}
+            aria-expanded={menuOpen}
+          >
+            <span /><span /><span />
+          </button>
+          <button className="cart-btn" onClick={() => setCartOpen(true)} aria-label={`Kundvagn, ${cartCount} artiklar`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
             </svg>
             KORG
-            <span className="cart-count">{cartCount}</span>
+            <span className="cart-count" aria-hidden="true">{cartCount}</span>
           </button>
         </div>
       </nav>
 
+      {/* MOBILE MENU */}
+      <div className={`mobile-menu ${menuOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Mobilmeny">
+        {[['#produkter','Shop'],['#om-oss','Om oss'],['#community','Community'],['#kontakt','Kontakt']].map(([href, label]) => (
+          <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
+        ))}
+      </div>
+
       {/* HERO */}
-      <section className="hero">
-        <div className="hero-bg" />
-        <div className="hero-lines" />
-        <div className="hero-court">
+      <section className="hero" aria-label="Välkommen till DINK">
+        <div className="hero-bg" aria-hidden="true" />
+        <div className="hero-lines" aria-hidden="true" />
+        <div className="hero-court" aria-hidden="true">
           <svg viewBox="0 0 600 600" fill="none">
             <rect x="60" y="60" width="480" height="480" stroke="#C8FF00" strokeWidth="3"/>
             <line x1="300" y1="60" x2="300" y2="540" stroke="#C8FF00" strokeWidth="2"/>
@@ -304,7 +426,7 @@ export default function Home() {
             <rect x="160" y="300" width="280" height="132" stroke="#C8FF00" strokeWidth="1.5"/>
           </svg>
         </div>
-        <div className="hero-glow" />
+        <div className="hero-glow" aria-hidden="true" />
         <div className="hero-content">
           <p className="hero-eyebrow">Sveriges #1 Pickleball Store</p>
           <h1 className="hero-h1">
@@ -325,7 +447,7 @@ export default function Home() {
       </div>
 
       {/* PRODUKTER */}
-      <section id="produkter">
+      <section id="produkter" aria-label="Utvalda produkter">
         <div className="products-header reveal">
           <div>
             <p className="section-eyebrow">Utvalda produkter</p>
@@ -334,52 +456,52 @@ export default function Home() {
         </div>
         <div className="product-grid">
           {PRODUCTS.map(p => (
-            <div className="product-card reveal" key={p.id}>
-              <div className={`product-img ${p.grad}`}>
-                <span>{p.emoji}</span>
+            <article className="product-card reveal" key={p.id} aria-label={p.name}>
+              <div className={`product-img ${p.grad}`} role="img" aria-label={`Produktbild för ${p.name}`}>
+                <span aria-hidden="true">{p.emoji}</span>
                 {p.badge && <span className="product-badge">{p.badge}</span>}
               </div>
               <div className="product-info">
-                <p className="product-name">{p.name}</p>
+                <h3 className="product-name">{p.name}</h3>
                 <p className="product-desc">{p.desc}</p>
                 <div className="product-footer">
-                  <span className="product-price">{p.price.toLocaleString('sv-SE')} kr</span>
-                  <button className="add-btn" onClick={() => addToCart(p)}>LÄGG I VARUKORG</button>
+                  <span className="product-price" aria-label={`Pris: ${p.price.toLocaleString('sv-SE')} kronor`}>{p.price.toLocaleString('sv-SE')} kr</span>
+                  <button className="add-btn" onClick={() => addToCart(p)} aria-label={`Lägg ${p.name} i varukorg`}>LÄGG I VARUKORG</button>
                 </div>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </section>
 
       {/* FEATURED */}
-      <section className="featured" id="featured">
+      <section className="featured" id="featured" aria-label="Veckans val">
         <div className="featured-inner">
-          <div className="featured-img reveal">
-            <div className="featured-img-glow" />
-            <span>🏓</span>
+          <div className="featured-img reveal" role="img" aria-label="Pro Carbon Paddle – produktbild">
+            <div className="featured-img-glow" aria-hidden="true" />
+            <span aria-hidden="true">🏓</span>
           </div>
           <div className="reveal">
             <span className="featured-badge">BÄSTSÄLJARE</span>
             <h2 className="featured-title">PRO CARBON<br/>PADDLE</h2>
             <p className="featured-desc">Kolfiberpaddle för den som vill dominera köket. Lätt, snabb och precis. Designad för spelare som inte kompromissar.</p>
-            <ul className="specs">
+            <ul className="specs" aria-label="Produktspecifikationer">
               {[['⚖️','Vikt','220g'],['🧱','Material','3K Kolfiber'],['✋','Grip','4.25"'],['🎯','Nivå','Avancerad']].map(([icon,label,val]) => (
                 <li className="spec-item" key={label}>
-                  <span className="spec-icon">{icon}</span>
+                  <span className="spec-icon" aria-hidden="true">{icon}</span>
                   <span className="spec-label">{label}</span>
                   <span className="spec-val">{val}</span>
                 </li>
               ))}
             </ul>
-            <p className="featured-price">1 299 kr</p>
+            <p className="featured-price" aria-label="Pris: 1 299 kronor">1 299 kr</p>
             <button className="btn-primary" onClick={() => addToCart(PRODUCTS[0])}>LÄGG I VARUKORG</button>
           </div>
         </div>
       </section>
 
       {/* USP */}
-      <section id="om-oss">
+      <section id="om-oss" aria-label="Varför DINK">
         <div className="reveal">
           <p className="section-eyebrow">Varför välja oss</p>
           <h2 className="section-title">VARFÖR DINK?</h2>
@@ -391,8 +513,8 @@ export default function Home() {
             ['🎾','EXPERT SUPPORT','Vårt team är pickleballspelare. Vi hjälper dig hitta rätt utrustning för din nivå.']
           ].map(([icon, title, text]) => (
             <div className="usp-card reveal" key={title}>
-              <span className="usp-icon">{icon}</span>
-              <p className="usp-title">{title}</p>
+              <span className="usp-icon" aria-hidden="true">{icon}</span>
+              <h3 className="usp-title">{title}</h3>
               <p className="usp-text">{text}</p>
             </div>
           ))}
@@ -400,18 +522,18 @@ export default function Home() {
       </section>
 
       {/* COMMUNITY */}
-      <section className="community" id="community">
-        <div className="community-glow" />
+      <section className="community" id="community" aria-label="DINK Nation community">
+        <div className="community-glow" aria-hidden="true" />
         <div className="community-content reveal">
           <p className="section-eyebrow">Gå med oss</p>
           <h2 className="community-title">JOIN THE<br/><span>DINK NATION</span></h2>
           <p className="community-sub">Bli en del av Sveriges snabbast växande pickleball-community. Tävlingar, tips och exklusiva erbjudanden.</p>
           <a href="#newsletter" className="btn-primary">GÅ MED NU</a>
-          <div className="community-stats">
+          <div className="community-stats" aria-label="Community-statistik">
             {[['12K+','Aktiva spelare'],['340+','Turneringar 2025'],['4.9★','Snittbetyg']].map(([num, label]) => (
               <div key={label}>
-                <p className="stat-num">{num}</p>
-                <p className="stat-label">{label}</p>
+                <p className="stat-num" aria-label={`${num} ${label}`}>{num}</p>
+                <p className="stat-label" aria-hidden="true">{label}</p>
               </div>
             ))}
           </div>
@@ -419,80 +541,81 @@ export default function Home() {
       </section>
 
       {/* NEWSLETTER */}
-      <section className="newsletter" id="newsletter">
+      <section className="newsletter" id="newsletter" aria-label="Nyhetsbrev">
         <div className="reveal">
           <p className="section-eyebrow">Håll dig uppdaterad</p>
           <h2 className="newsletter-title">GET IN<br/><span>THE LOOP.</span></h2>
           <p className="newsletter-sub">Exklusiva erbjudanden, nya produkter och pickleballtips – direkt i din inkorg.</p>
         </div>
-        <form className="newsletter-form reveal" onSubmit={e => { e.preventDefault(); showToast('Tack! Du är nu med i DINK Nation. 🎉'); e.target.reset(); }}>
-          <input type="email" placeholder="Din e-postadress" required />
+        <form className="newsletter-form reveal" onSubmit={e => { e.preventDefault(); showToast('Tack! Du är nu med i DINK Nation. 🎉'); e.target.reset(); }} aria-label="Prenumerera på nyhetsbrev">
+          <label htmlFor="email" style={{position:'absolute',width:'1px',height:'1px',overflow:'hidden',clip:'rect(0,0,0,0)'}}>E-postadress</label>
+          <input id="email" type="email" placeholder="Din e-postadress" required autoComplete="email" />
           <button type="submit">PRENUMERERA</button>
         </form>
       </section>
 
       {/* FOOTER */}
-      <footer id="kontakt">
+      <footer id="kontakt" role="contentinfo">
         <div className="footer-top">
           <div>
             <p className="footer-brand-name">DINK</p>
             <p className="footer-brand-desc">Sveriges bästa pickleball-utrustning. För spelare som vill äga köket – varje match, varje dag.</p>
           </div>
-          <div>
+          <nav aria-label="Shopnavigation">
             <p className="footer-col-title">Shop</p>
             <ul className="footer-links">
               {['Paddlar','Bollar','Väskor','Tillbehör','Nya produkter'].map(l => <li key={l}><a href="#">{l}</a></li>)}
             </ul>
-          </div>
-          <div>
+          </nav>
+          <nav aria-label="Infonavigation">
             <p className="footer-col-title">Info</p>
             <ul className="footer-links">
               {['Om DINK','Frakt & Retur','Storleksguide','FAQ','Kontakt'].map(l => <li key={l}><a href="#">{l}</a></li>)}
             </ul>
-          </div>
+          </nav>
           <div>
             <p className="footer-col-title">Kontakt</p>
             <ul className="footer-links">
               <li><a href="mailto:hej@dink.se">hej@dink.se</a></li>
-              <li><a href="#">Instagram</a></li>
-              <li><a href="#">TikTok</a></li>
-              <li><a href="#">YouTube</a></li>
+              <li><a href="#" aria-label="DINK på Instagram">Instagram</a></li>
+              <li><a href="#" aria-label="DINK på TikTok">TikTok</a></li>
+              <li><a href="#" aria-label="DINK på YouTube">YouTube</a></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <p className="footer-copy">© 2025 <span>DINK</span> — Own the Kitchen.</p>
+          <p className="footer-copy">© 2025 <span>DINK</span> — Own the Kitchen. Alla rättigheter förbehållna.</p>
           <div className="social-links">
-            <a href="#" className="social-link">IG</a>
-            <a href="#" className="social-link">TK</a>
-            <a href="#" className="social-link">YT</a>
+            <a href="#" className="social-link" aria-label="Instagram">IG</a>
+            <a href="#" className="social-link" aria-label="TikTok">TK</a>
+            <a href="#" className="social-link" aria-label="YouTube">YT</a>
           </div>
         </div>
       </footer>
 
       {/* CART DRAWER */}
-      <div className={`cart-overlay ${cartOpen ? 'open' : ''}`} onClick={() => setCartOpen(false)} />
-      <div className={`cart-drawer ${cartOpen ? 'open' : ''}`}>
+      <div className={`cart-overlay ${cartOpen ? 'open' : ''}`} onClick={() => setCartOpen(false)} aria-hidden="true" />
+      <div className={`cart-drawer ${cartOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Kundvagn">
         <div className="cart-header">
           <p className="cart-title">Din korg ({cartCount})</p>
-          <button className="cart-close" onClick={() => setCartOpen(false)}>×</button>
+          <button className="cart-close" onClick={() => setCartOpen(false)} aria-label="Stäng kundvagn">×</button>
         </div>
         <div className="cart-body">
           {cart.length === 0 ? (
             <div className="cart-empty">
-              <p className="cart-empty-icon">🏓</p>
+              <p className="cart-empty-icon" aria-hidden="true">🏓</p>
               <p className="cart-empty-text">Din korg är tom.<br/>Börja shoppa för att lägga till produkter.</p>
             </div>
           ) : (
             <div className="cart-items">
-              {cart.map((item, i) => (
+              {cart.map((item) => (
                 <div className="cart-item" key={item.id}>
-                  <div className="cart-item-img">{item.emoji}</div>
+                  <div className="cart-item-img" aria-hidden="true">{item.emoji}</div>
                   <div>
                     <p className="cart-item-name">{item.name}</p>
                     <p className="cart-item-price">{(item.price * item.qty).toLocaleString('sv-SE')} kr{item.qty > 1 ? ` (${item.qty}×)` : ''}</p>
                   </div>
-                  <button className="remove-item" onClick={() => removeFromCart(item.id)}>✕</button>
+                  <button className="remove-item" onClick={() => removeFromCart(item.id)} aria-label={`Ta bort ${item.name}`}>✕</button>
                 </div>
               ))}
             </div>
@@ -512,8 +635,23 @@ export default function Home() {
         )}
       </div>
 
+      {/* COOKIE BANNER */}
+      {!cookieAccepted && (
+        <div className="cookie-banner" role="dialog" aria-label="Cookie-samtycke" aria-live="polite">
+          <p className="cookie-text">
+            Vi använder cookies för att ge dig en bättre upplevelse och för att hantera betalningar via Stripe.
+            Genom att klicka &quot;Acceptera&quot; godkänner du vår{' '}
+            <a href="#">integritetspolicy</a>.
+          </p>
+          <div className="cookie-btns">
+            <button className="cookie-decline" onClick={acceptCookies}>Endast nödvändiga</button>
+            <button className="cookie-accept" onClick={acceptCookies}>Acceptera alla</button>
+          </div>
+        </div>
+      )}
+
       {/* TOAST */}
-      <div className={`toast ${toast.show ? 'show' : ''}`}>{toast.msg}</div>
+      <div className={`toast ${toast.show ? 'show' : ''}`} role="status" aria-live="polite">{toast.msg}</div>
     </>
   );
 }

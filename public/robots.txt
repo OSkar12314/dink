@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dink-taupe.vercel.app/sitemap.xml
