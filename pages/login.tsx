@@ -1,12 +1,26 @@
 import Head from 'next/head';
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/router';
+import { Mail } from 'lucide-react';
 
 export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [notifyState, setNotifyState] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
   const router = useRouter();
+
+  async function handleNotify(e: FormEvent) {
+    e.preventDefault();
+    setNotifyState('loading');
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    setNotifyState(res.ok ? 'done' : 'error');
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -138,6 +152,54 @@ export default function Login() {
           text-align: center;
           letter-spacing: 0.06em;
         }
+        .notify-section {
+          margin-top: 2rem;
+          padding-top: 2rem;
+          border-top: 1px solid #2A2A2A;
+        }
+        .notify-label {
+          font-family: 'Space Grotesk', sans-serif;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #555;
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          margin-bottom: 0.75rem;
+        }
+        .notify-row {
+          display: flex;
+          gap: 0.5rem;
+        }
+        .notify-row input {
+          margin-bottom: 0;
+          flex: 1;
+          font-size: 0.9rem;
+        }
+        .notify-btn {
+          width: auto;
+          padding: 0 1.25rem;
+          background: transparent;
+          border: 1.5px solid #C8FF00;
+          color: #C8FF00;
+          white-space: nowrap;
+          transform: none !important;
+        }
+        .notify-btn:hover:not(:disabled) { background: rgba(200,255,0,0.08); transform: none !important; }
+        .notify-success {
+          font-size: 0.78rem;
+          color: #C8FF00;
+          margin-top: 0.6rem;
+          letter-spacing: 0.04em;
+        }
+        .notify-error-msg {
+          font-size: 0.78rem;
+          color: #ff5555;
+          margin-top: 0.6rem;
+          letter-spacing: 0.04em;
+        }
       `}</style>
 
       <div className="card">
@@ -162,6 +224,34 @@ export default function Login() {
         </form>
         <hr className="divider" />
         <p className="hint">Denna sida är lösenordsskyddad</p>
+
+        <div className="notify-section">
+          <p className="notify-label">
+            <Mail size={13} stroke="#555" strokeWidth={2} />
+            Få notis när vi öppnar
+          </p>
+          {notifyState === 'done' ? (
+            <p className="notify-success">✓ Du är på listan — vi hör av oss!</p>
+          ) : (
+            <form onSubmit={handleNotify}>
+              <div className="notify-row">
+                <input
+                  type="email"
+                  placeholder="din@epost.se"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+                <button type="submit" className="notify-btn" disabled={notifyState === 'loading'}>
+                  {notifyState === 'loading' ? '...' : 'NOTIFIERA MIG'}
+                </button>
+              </div>
+              {notifyState === 'error' && (
+                <p className="notify-error-msg">Något gick fel. Försök igen.</p>
+              )}
+            </form>
+          )}
+        </div>
       </div>
     </>
   );
