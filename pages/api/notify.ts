@@ -1,18 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
-import path from 'path';
 
-const FILE = path.join(process.cwd(), 'notify-emails.json');
+const API_KEY = process.env.MAILCHIMP_API_KEY!;
+const AUDIENCE_ID = process.env.MAILCHIMP_AUDIENCE_ID!;
+const SERVER = process.env.MAILCHIMP_SERVER!;
 
-function readEmails(): string[] {
-  try {
-    return JSON.parse(fs.readFileSync(FILE, 'utf8'));
-  } catch {
-    return [];
-  }
-}
-
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const { email } = req.body;
@@ -20,15 +12,27 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(400).json({ error: 'Ogiltig e-postadress.' });
   }
 
-  const emails = readEmails();
-  const normalized = email.trim().toLowerCase();
+  const response = await fetch(
+    `https://${SERVER}.api.mailchimp.com/3.0/lists/${AUDIENCE_ID}/members`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `apikey ${API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email_address: email.trim().toLowerCase(),
+        status: 'subscribed',
+        tags: ['waitlist'],
+      }),
+    }
+  );
 
-  if (emails.includes(normalized)) {
-    return res.status(200).json({ ok: true, already: true });
-  }
+  if (response.ok) return res.status(200).json({ ok: true });
 
-  emails.push(normalized);
-  fs.writeFileSync(FILE, JSON.stringify(emails, null, 2));
+  const data = await response.json();
+  // Already subscribed is still a success for the user
+  if (data.title === 'Member Exists') return res.status(200).json({ ok: true });
 
-  return res.status(200).json({ ok: true });
+  return res.status(500).json({ error: 'Kunde inte spara e-postadressen.' });
 }
