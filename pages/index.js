@@ -1,13 +1,16 @@
 import Head from 'next/head';
 import { useEffect, useState, useRef } from 'react';
+import { Zap, Trophy, RefreshCw, Headphones, Scale, Layers, Hand, Target, ShoppingBag, Package, Wrench, ShieldCheck, ShoppingCart } from 'lucide-react';
 
 const SITE_URL = 'https://dink-taupe.vercel.app';
 
+const ICON_PROPS = { size: 40, stroke: '#C8FF00', strokeWidth: 1.25 };
+
 const PRODUCTS = [
-  { id: 1, name: 'PRO CARBON PADDLE', desc: 'Kolfiberpaddle för den som vill dominera köket', price: 1299, emoji: '🏓', badge: 'Bestseller', grad: 'grad-1' },
-  { id: 2, name: 'OUTDOOR BALLS 3-PACK', desc: 'Optimerad för utomhusspel i alla väderförhållanden', price: 249, emoji: '🟡', grad: 'grad-2' },
-  { id: 3, name: 'DINK BACKPACK', desc: 'Rymlig väska med paddelfack och ventilerat rygg', price: 899, emoji: '🎒', grad: 'grad-3' },
-  { id: 4, name: 'GRIP TAPE 3-PACK', desc: 'Absorberande grip för maximal kontroll vid varje slag', price: 149, emoji: '🔧', grad: 'grad-4' },
+  { id: 1, name: 'PRO CARBON PADDLE', desc: 'Kolfiberpaddle för den som vill dominera köket', price: 1299, Icon: () => <Target {...ICON_PROPS} />, badge: 'Bestseller', grad: 'grad-1' },
+  { id: 2, name: 'OUTDOOR BALLS 3-PACK', desc: 'Optimerad för utomhusspel i alla väderförhållanden', price: 249, Icon: () => <Layers {...ICON_PROPS} />, grad: 'grad-2' },
+  { id: 3, name: 'DINK BACKPACK', desc: 'Rymlig väska med paddelfack och ventilerat rygg', price: 899, Icon: () => <Package {...ICON_PROPS} />, grad: 'grad-3' },
+  { id: 4, name: 'GRIP TAPE 3-PACK', desc: 'Absorberande grip för maximal kontroll vid varje slag', price: 149, Icon: () => <Wrench {...ICON_PROPS} />, grad: 'grad-4' },
 ];
 
 const structuredData = {
@@ -467,7 +470,7 @@ export default function Home() {
           {PRODUCTS.map(p => (
             <article className="product-card reveal" key={p.id} aria-label={p.name}>
               <div className={`product-img ${p.grad}`} role="img" aria-label={`Produktbild för ${p.name}`}>
-                <span aria-hidden="true">{p.emoji}</span>
+                <p.Icon />
                 {p.badge && <span className="product-badge">{p.badge}</span>}
               </div>
               <div className="product-info">
@@ -488,14 +491,19 @@ export default function Home() {
         <div className="featured-inner">
           <div className="featured-img reveal" role="img" aria-label="Pro Carbon Paddle – produktbild">
             <div className="featured-img-glow" aria-hidden="true" />
-            <span aria-hidden="true">🏓</span>
+            <Target size={80} stroke="#C8FF00" strokeWidth={1} />
           </div>
           <div className="reveal">
             <span className="featured-badge">BÄSTSÄLJARE</span>
             <h2 className="featured-title">PRO CARBON<br/>PADDLE</h2>
             <p className="featured-desc">Kolfiberpaddle för den som vill dominera köket. Lätt, snabb och precis. Designad för spelare som inte kompromissar.</p>
             <ul className="specs" aria-label="Produktspecifikationer">
-              {[['⚖️','Vikt','220g'],['🧱','Material','3K Kolfiber'],['✋','Grip','4.25"'],['🎯','Nivå','Avancerad']].map(([icon,label,val]) => (
+              {[
+                [<Scale size={14} stroke="#C8FF00" strokeWidth={1.5} />,'Vikt','220g'],
+                [<Layers size={14} stroke="#C8FF00" strokeWidth={1.5} />,'Material','3K Kolfiber'],
+                [<Hand size={14} stroke="#C8FF00" strokeWidth={1.5} />,'Grip','4.25"'],
+                [<Target size={14} stroke="#C8FF00" strokeWidth={1.5} />,'Nivå','Avancerad'],
+              ].map(([icon,label,val]) => (
                 <li className="spec-item" key={label}>
                   <span className="spec-icon" aria-hidden="true">{icon}</span>
                   <span className="spec-label">{label}</span>
@@ -516,10 +524,11 @@ export default function Home() {
           <h2 className="section-title">VARFÖR DINK?</h2>
         </div>
         <div className="usp-grid">
-          {[['⚡','SNABB LEVERANS','1–3 arbetsdagar till hela Sverige. Gratis frakt på alla ordrar över 500 kr.'],
-            ['🏆','PREMIUM KVALITET','Vi väljer bara ut utrustning som klarar de tuffaste matcherna. Testat av proffs.'],
-            ['🔄','30 DAGARS RETUR','Inte nöjd? Skicka tillbaka utan krångel. Full återbetalning, inga frågor.'],
-            ['🎾','EXPERT SUPPORT','Vårt team är pickleballspelare. Vi hjälper dig hitta rätt utrustning för din nivå.']
+          {[
+            [<Zap size={24} stroke="#C8FF00" strokeWidth={1.5} />,'SNABB LEVERANS','1–3 arbetsdagar till hela Sverige. Gratis frakt på alla ordrar över 500 kr.'],
+            [<Trophy size={24} stroke="#C8FF00" strokeWidth={1.5} />,'PREMIUM KVALITET','Vi väljer bara ut utrustning som klarar de tuffaste matcherna. Testat av proffs.'],
+            [<RefreshCw size={24} stroke="#C8FF00" strokeWidth={1.5} />,'30 DAGARS RETUR','Inte nöjd? Skicka tillbaka utan krångel. Full återbetalning, inga frågor.'],
+            [<Headphones size={24} stroke="#C8FF00" strokeWidth={1.5} />,'EXPERT SUPPORT','Vårt team är pickleballspelare. Vi hjälper dig hitta rätt utrustning för din nivå.'],
           ].map(([icon, title, text]) => (
             <div className="usp-card reveal" key={title}>
               <span className="usp-icon" aria-hidden="true">{icon}</span>
@@ -608,14 +617,14 @@ export default function Home() {
         <div className="cart-body">
           {cart.length === 0 ? (
             <div className="cart-empty">
-              <p className="cart-empty-icon" aria-hidden="true">🏓</p>
+              <div className="cart-empty-icon" aria-hidden="true"><ShoppingCart size={40} stroke="#555" strokeWidth={1.25} /></div>
               <p className="cart-empty-text">Din korg är tom.<br/>Börja shoppa för att lägga till produkter.</p>
             </div>
           ) : (
             <div className="cart-items">
               {cart.map((item) => (
                 <div className="cart-item" key={item.id}>
-                  <div className="cart-item-img" aria-hidden="true">{item.emoji}</div>
+                  <div className="cart-item-img" aria-hidden="true"><ShoppingBag size={24} stroke="#C8FF00" strokeWidth={1.25} /></div>
                   <div>
                     <p className="cart-item-name">{item.name}</p>
                     <p className="cart-item-price">{(item.price * item.qty).toLocaleString('sv-SE')} kr{item.qty > 1 ? ` (${item.qty}×)` : ''}</p>
@@ -635,7 +644,7 @@ export default function Home() {
             <button className="btn-primary" style={{width:'100%',textAlign:'center'}} onClick={handleCheckout} disabled={loading}>
               {loading ? 'LADDAR...' : 'TILL KASSAN →'}
             </button>
-            <p className="stripe-note">🔒 Säker betalning via Stripe</p>
+            <p className="stripe-note"><ShieldCheck size={13} stroke="#555" strokeWidth={1.5} style={{display:'inline',verticalAlign:'middle',marginRight:'4px'}} /> Säker betalning via Stripe</p>
           </div>
         )}
       </div>
