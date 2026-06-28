@@ -579,25 +579,21 @@ export default function Home() {
           <div>
             <p className="footer-col-title">Info</p>
             <ul className="footer-links">
-              {['Om DINK','Frakt & Retur','Storleksguide','FAQ','Kontakt'].map(l => <li key={l}><a href="#">{l}</a></li>)}
+              {[['Om DINK','#om-oss'],['Frakt & Retur','/frakt-retur'],['FAQ','/faq'],['Kontakt','#kontakt']].map(([l,h]) => <li key={l}><a href={h}>{l}</a></li>)}
             </ul>
           </div>
           <div>
             <p className="footer-col-title">Kontakt</p>
             <ul className="footer-links">
               <li><a href="mailto:hej@dink.se">hej@dink.se</a></li>
-              <li><a href="#" aria-label="DINK på Instagram">Instagram</a></li>
-              <li><a href="#" aria-label="DINK på TikTok">TikTok</a></li>
-              <li><a href="#" aria-label="DINK på YouTube">YouTube</a></li>
+              <li><a href="https://www.instagram.com/dinksverige" target="_blank" rel="noopener noreferrer" aria-label="DINK på Instagram">Instagram</a></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
           <p className="footer-copy">© 2025 <span>DINK</span> — Own the Kitchen. Alla rättigheter förbehållna.</p>
           <div className="social-links">
-            <a href="#" className="social-link" aria-label="Instagram">IG</a>
-            <a href="#" className="social-link" aria-label="TikTok">TK</a>
-            <a href="#" className="social-link" aria-label="YouTube">YT</a>
+            <a href="https://www.instagram.com/dinksverige" target="_blank" rel="noopener noreferrer" className="social-link" aria-label="Instagram">IG</a>
           </div>
         </div>
       </footer>
@@ -650,7 +646,7 @@ export default function Home() {
           <p className="cookie-text">
             Vi använder cookies för att ge dig en bättre upplevelse och för att hantera betalningar via Stripe.
             Genom att klicka &quot;Acceptera&quot; godkänner du vår{' '}
-            <a href="#">integritetspolicy</a>.
+            <a href="/integritetspolicy">integritetspolicy</a>.
           </p>
           <div className="cookie-btns">
             <button className="cookie-decline" onClick={acceptCookies}>Endast nödvändiga</button>
