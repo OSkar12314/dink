@@ -205,6 +205,14 @@ export default function Home() {
         .cart-btn:hover { opacity: 1; color: var(--accent); }
         .cart-count { background: var(--accent); color: #000; font-size: 0.65rem; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
+        /* SHOP DROPDOWN */
+        .nav-shop { position: relative; }
+        .shop-dropdown { position: absolute; top: calc(100% + 12px); left: 50%; transform: translateX(-50%); background: #111; border: 1px solid var(--border); min-width: 180px; opacity: 0; pointer-events: none; transform: translateX(-50%) translateY(-6px); transition: opacity 0.2s, transform 0.2s; }
+        .nav-shop:hover .shop-dropdown { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+        .shop-dropdown a { display: block; padding: 0.85rem 1.25rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; border-bottom: 1px solid var(--border); transition: color 0.15s, background 0.15s; opacity: 1; }
+        .shop-dropdown a:last-child { border-bottom: none; }
+        .shop-dropdown a:hover { color: var(--accent); background: rgba(200,255,0,0.04); }
+
         /* HAMBURGER */
         .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; flex-direction: column; gap: 5px; }
         .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
@@ -213,10 +221,15 @@ export default function Home() {
         .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
         /* MOBILE MENU */
-        .mobile-menu { position: fixed; inset: 0; background: #0a0a0a; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5rem; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
+        .mobile-menu { position: fixed; inset: 0; background: #0a0a0a; z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.75rem; transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); }
         .mobile-menu.open { transform: translateX(0); }
-        .mobile-menu a { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.08em; color: var(--white); text-decoration: none; transition: color 0.2s; }
-        .mobile-menu a:hover { color: var(--accent); }
+        .mobile-menu > a { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.08em; color: var(--white); text-decoration: none; transition: color 0.2s; }
+        .mobile-menu > a:hover { color: var(--accent); }
+        .mobile-shop-group { display: flex; flex-direction: column; align-items: center; gap: 0.6rem; }
+        .mobile-shop-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; letter-spacing: 0.08em; color: var(--white); }
+        .mobile-shop-cats { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+        .mobile-shop-cats a { font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+        .mobile-shop-cats a:hover { color: var(--accent); }
 
         @media (max-width: 760px) { .nav-links { display: none; } .hamburger { display: flex; } }
 
@@ -255,12 +268,15 @@ export default function Home() {
         .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 6vw, 5.5rem); letter-spacing: 0.04em; line-height: 1; }
 
         /* PRODUCTS */
+        #produkter { background: #F5F5F0; color: #0A0A0A; }
+        #produkter .section-eyebrow { color: #6B8F00; }
+        #produkter .section-title { color: #0A0A0A; }
         .products-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem; }
         .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
         @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 560px) { .product-grid { grid-template-columns: 1fr; } }
-        .product-card { background: var(--card-bg); border: 1px solid var(--border); transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; cursor: pointer; position: relative; overflow: hidden; }
-        .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.5); border-color: rgba(200,255,0,0.25); }
+        .product-card { background: #fff; border: 1px solid #E0E0D8; transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; cursor: pointer; position: relative; overflow: hidden; }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(0,0,0,0.12); border-color: #C8FF00; }
         .product-img { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; position: relative; font-size: 4rem; }
         .grad-1 { background: linear-gradient(135deg, #1a1f0a 0%, #2d3d00 100%); }
         .grad-2 { background: linear-gradient(135deg, #0a1a1f 0%, #00283d 100%); }
@@ -268,28 +284,28 @@ export default function Home() {
         .grad-4 { background: linear-gradient(135deg, #1a1a0a 0%, #3d3d00 100%); }
         .product-badge { position: absolute; top: 1rem; left: 1rem; background: var(--accent); color: #000; font-family: 'Space Grotesk', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.3rem 0.6rem; }
         .product-info { padding: 1.25rem; }
-        .product-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.35rem; }
-        .product-desc { font-size: 0.78rem; color: var(--sub); margin-bottom: 1rem; line-height: 1.5; }
+        .product-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.35rem; color: #0A0A0A; }
+        .product-desc { font-size: 0.78rem; color: #777; margin-bottom: 1rem; line-height: 1.5; }
         .product-footer { display: flex; align-items: center; justify-content: space-between; }
-        .product-price { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
-        .add-btn { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: var(--white); padding: 0.5rem 0.9rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s; }
+        .product-price { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 700; color: #0A0A0A; }
+        .add-btn { background: #0A0A0A; border: 1.5px solid #0A0A0A; color: #fff; padding: 0.5rem 0.9rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s, border-color 0.2s, color 0.2s; }
         .add-btn:hover { background: var(--accent); border-color: var(--accent); color: #000; }
 
         /* FEATURED */
-        .featured { background: var(--card-bg); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+        .featured { background: #EEEEE8; border-top: 1px solid #D8D8D0; border-bottom: 1px solid #D8D8D0; }
         .featured-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; align-items: center; }
         @media (max-width: 820px) { .featured-inner { grid-template-columns: 1fr; } }
-        .featured-img { aspect-ratio: 1; background: linear-gradient(135deg, #0f0f0f, #1e1e1e); display: flex; align-items: center; justify-content: center; font-size: 8rem; border: 1px solid var(--border); position: relative; }
+        .featured-img { aspect-ratio: 1; background: linear-gradient(135deg, #e0e0d8, #f0f0ea); display: flex; align-items: center; justify-content: center; font-size: 8rem; border: 1px solid #D8D8D0; position: relative; }
         .featured-img-glow { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, rgba(200,255,0,0.08) 0%, transparent 65%); }
         .featured-badge { display: inline-block; background: var(--accent); color: #000; font-family: 'Space Grotesk', sans-serif; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.35rem 0.8rem; margin-bottom: 1.25rem; }
-        .featured-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4.5rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1rem; }
-        .featured-desc { font-size: 1rem; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 2rem; max-width: 400px; }
-        .specs { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+        .featured-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4.5rem); letter-spacing: 0.04em; line-height: 1; margin-bottom: 1rem; color: #0A0A0A; }
+        .featured-desc { font-size: 1rem; color: rgba(0,0,0,0.55); line-height: 1.7; margin-bottom: 2rem; max-width: 400px; }
+        .specs { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem; border-top: 1px solid #D8D8D0; padding-top: 1.5rem; }
         .spec-item { display: flex; align-items: center; gap: 0.75rem; font-size: 0.875rem; }
-        .spec-icon { width: 32px; height: 32px; background: rgba(200,255,0,0.08); border: 1px solid rgba(200,255,0,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .spec-label { color: var(--sub); min-width: 80px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
-        .spec-val { color: var(--white); font-weight: 500; }
-        .featured-price { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 1.25rem; }
+        .spec-icon { width: 32px; height: 32px; background: rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .spec-label { color: #888; min-width: 80px; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+        .spec-val { color: #0A0A0A; font-weight: 500; }
+        .featured-price { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: #0A0A0A; margin-bottom: 1.25rem; }
 
         /* USP */
         .usp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 4rem; border: 1px solid var(--border); }
@@ -391,7 +407,16 @@ export default function Home() {
       <nav id="navbar" role="navigation" aria-label="Huvudnavigation">
         <a href="/" className="nav-logo" aria-label="DINK – Startsida">DINK</a>
         <ul className="nav-links">
-          <li><a href="#produkter">Shop</a></li>
+          <li className="nav-shop">
+            <a href="/shop">Shop</a>
+            <div className="shop-dropdown">
+              <a href="/shop">Alla produkter</a>
+              <a href="/shop?k=paddlar">Paddlar</a>
+              <a href="/shop?k=bollar">Bollar</a>
+              <a href="/shop?k=vaskor">Väskor</a>
+              <a href="/shop?k=tillbehor">Tillbehör</a>
+            </div>
+          </li>
           <li><a href="#om-oss">Om oss</a></li>
           <li><a href="#community">Community</a></li>
           <li><a href="#kontakt">Kontakt</a></li>
@@ -418,9 +443,19 @@ export default function Home() {
 
       {/* MOBILE MENU */}
       <div className={`mobile-menu ${menuOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Mobilmeny">
-        {[['#produkter','Shop'],['#om-oss','Om oss'],['#community','Community'],['#kontakt','Kontakt']].map(([href, label]) => (
-          <a key={href} href={href} onClick={() => setMenuOpen(false)}>{label}</a>
-        ))}
+        <div className="mobile-shop-group">
+          <span className="mobile-shop-title">Shop</span>
+          <div className="mobile-shop-cats">
+            <a href="/shop" onClick={() => setMenuOpen(false)}>Alla</a>
+            <a href="/shop?k=paddlar" onClick={() => setMenuOpen(false)}>Paddlar</a>
+            <a href="/shop?k=bollar" onClick={() => setMenuOpen(false)}>Bollar</a>
+            <a href="/shop?k=vaskor" onClick={() => setMenuOpen(false)}>Väskor</a>
+            <a href="/shop?k=tillbehor" onClick={() => setMenuOpen(false)}>Tillbehör</a>
+          </div>
+        </div>
+        <a href="#om-oss" onClick={() => setMenuOpen(false)}>Om oss</a>
+        <a href="#community" onClick={() => setMenuOpen(false)}>Community</a>
+        <a href="#kontakt" onClick={() => setMenuOpen(false)}>Kontakt</a>
       </div>
 
       {/* HERO */}
