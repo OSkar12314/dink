@@ -88,6 +88,15 @@ export default function Shop() {
         .cart-btn:hover { opacity: 1; color: var(--accent); }
         .cart-count { background: var(--accent); color: #000; font-size: 0.65rem; font-weight: 700; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
+        /* SHOP DROPDOWN */
+        .nav-shop { position: relative; }
+        .shop-dropdown { position: absolute; top: 100%; left: 50%; transform: translateX(-50%) translateY(-4px); background: #111; border: 1px solid #2A2A2A; min-width: 180px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; padding-top: 8px; }
+        .shop-dropdown::before { content: ''; position: absolute; top: -20px; left: 0; right: 0; height: 20px; }
+        .nav-shop:hover .shop-dropdown { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+        .shop-dropdown a { display: block; padding: 0.85rem 1.25rem; font-family: 'Space Grotesk', sans-serif; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; border-bottom: 1px solid #2A2A2A; transition: color 0.15s, background 0.15s; opacity: 1; }
+        .shop-dropdown a:last-child { border-bottom: none; }
+        .shop-dropdown a:hover { color: #C8FF00; background: rgba(200,255,0,0.04); }
+
         /* HAMBURGER */
         .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; flex-direction: column; gap: 5px; }
         .hamburger span { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; transition: transform 0.3s, opacity 0.3s; }
@@ -182,7 +191,16 @@ export default function Shop() {
       <nav id="navbar">
         <a href="/" className="nav-logo">DINK</a>
         <ul className="nav-links">
-          <li><a href="/shop" className="active">Shop</a></li>
+          <li className="nav-shop">
+            <a href="/shop" className="active">Shop</a>
+            <div className="shop-dropdown">
+              <a href="/shop">Alla produkter</a>
+              <a href="/shop?k=paddlar">Paddlar</a>
+              <a href="/shop?k=bollar">Bollar</a>
+              <a href="/shop?k=vaskor">Väskor</a>
+              <a href="/shop?k=tillbehor">Tillbehör</a>
+            </div>
+          </li>
           <li><a href="/#om-oss">Om oss</a></li>
           <li><a href="/#community">Community</a></li>
           <li><a href="/#kontakt">Kontakt</a></li>
